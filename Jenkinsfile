@@ -17,8 +17,7 @@ pipeline {
 
         stage('Docker Clean') {
             steps {
-                bat 'docker stop java-app || exit 0'
-                bat 'docker rm java-app || exit 0'
+                bat 'docker rm -f java-app || exit 0'
             }
         }
         stage('Docker Build') {
