@@ -15,5 +15,17 @@ pipeline {
             }
         }
 
+        stage('Docker Build') {
+            steps {
+                bat 'docker build -t java-app .'
+            }
+        }
+
+        stage('Docker Run') {
+            steps {
+                bat 'docker run -d -p 9091:8080 java-app'
+            }
+        }
+
     }
 }
