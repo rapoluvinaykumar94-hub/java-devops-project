@@ -29,7 +29,7 @@ pipeline {
 
         stage('Docker Run') {
             steps {
-                bat 'docker run -d -p 9091:8080 java-app'
+                bat 'docker run -d -p 9091:8080 java-app java_app'
             }
         }
 
