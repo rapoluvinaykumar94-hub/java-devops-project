@@ -26,11 +26,11 @@ pipeline {
             }
         }
 
-        stage('Docker Run') {
-            steps {
-                sh 'docker run -d -p 9091:8080 --name java-app java-app'
-            }
-        }
-
+       stage('Docker Run') {
+           steps {
+               sh 'docker rm -f java-app || true'
+               sh 'docker run -d -p 9091:8080 --name java-app java-app'
+           }
+      }
     }
 }
