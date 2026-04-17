@@ -11,24 +11,24 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'mvn clean package'
+                sh 'mvn clean package'
             }
         }
 
         stage('Docker Clean') {
             steps {
-                bat 'docker rm -f java-app || exit 0'
+                sh 'docker rm -f java-app || exit 0'
             }
         }
         stage('Docker Build') {
             steps {
-                bat 'docker build -t java-app .'
+                sh 'docker build -t java-app .'
             }
         }
 
         stage('Docker Run') {
             steps {
-                bat 'docker run -d -p 9091:8080 --name java-app java-app'
+                sh 'docker run -d -p 9091:8080 --name java-app java-app'
             }
         }
 
