@@ -31,6 +31,16 @@ pipeline {
                sh 'docker rm -f java-app || true'
                sh 'docker run -d -p 9091:8080 --name java-app java-app'
            }
-      }
+       }
+          
+       stage('Deploy to Kubernetes') {
+         steps {
+             sh '''
+              export KUBECONFIG=/var/lib/jenkins/config
+              kubectl apply -f deployment.yml
+              kubectl apply -f service.yml
+              '''
+          }
+       }
     }
 }
