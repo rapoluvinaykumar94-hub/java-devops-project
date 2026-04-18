@@ -1,46 +1,46 @@
 pipeline {
     agent any
 
+    environment {
+        DOCKER_IMAGE = "vinayreddyra/java-app"
+    }
+
     stages {
 
         stage('Clone') {
             steps {
-                git url: 'https://github.com/rapoluvinaykumar94-hub/java-devops-project.git', branch: 'main'
+                git 'https://github.com/rapoluvinaykumar94-hub/java-devops-project.git'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean package -DskipTests || mvn clean package -DskipTests'
+                sh 'mvn clean package'
             }
         }
 
-        stage('Docker Clean') {
-            steps {
-                sh 'docker rm -f java-app || exit 0'
-            }
-        }
         stage('Docker Build') {
             steps {
-                sh 'docker build -t java-app .'
+                sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
-       stage('Docker Run') {
-           steps {
-               sh 'docker rm -f java-app || true'
-               sh 'docker run -d -p 9091:8080 --name java-app java-app'
-           }
-       }
-          
-       stage('Deploy to Kubernetes') {
-         steps {
-             sh '''
-              export KUBECONFIG=/var/lib/jenkins/config
-              kubectl apply -f deployment.yml
-              kubectl apply -f service.yml
-              '''
-          }
-       }
+        stage('Docker Push') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
+                    sh '''
+                    docker login -u $USER -p $PASS
+                    docker push $DOCKER_IMAGE
+                    '''
+                }
+            }
+        }
+
+        stage('Deploy to EKS') {
+            steps {
+                sh 'kubectl apply -f deployment.yml'
+                sh 'kubectl apply -f service.yml'
+            }
+        }
     }
 }
