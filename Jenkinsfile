@@ -36,11 +36,15 @@ pipeline {
             }
         }
 
-        stage('Deploy to EKS') {
-            steps {
-                sh 'kubectl apply -f deployment.yml'
-                sh 'kubectl apply -f service.yml'
-            }
-        }
+       stage('Deploy to EKS') {
+           steps {
+              sh '''
+              export KUBECONFIG=/var/lib/jenkins/config
+              kubectl get nodes
+              kubectl apply -f deployment.yml
+              kubectl apply -f service.yml
+              '''
+    }
+}
     }
 }
