@@ -36,15 +36,21 @@ pipeline {
             }
         }
 
-       stage('Deploy to EKS') {
-           steps {
-              sh '''
-              export KUBECONFIG=/var/lib/jenkins/config
-              kubectl get nodes
-              kubectl apply -f deployment.yml
-              kubectl apply -f service.yml
-              '''
-    }
-}
+          stage('Deploy to EKS') {
+            steps {
+               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']]) {
+                  sh '''
+                  export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                  export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+
+                  aws eks update-kubeconfig --region us-east-1 --name <your-cluster-name>
+
+                  kubectl get nodes
+                  kubectl apply -f deployment.yml
+                  kubectl apply -f service.yml
+                  '''
+               }
+            }
+        }
     }
 }
